@@ -27,6 +27,8 @@ The editor provides quick formatting buttons for:
 - **Paste Markdown**: Click the "Paste Markdown Text" button to quickly paste text from your clipboard
 - **Copy Rendered Text**: Copy the rendered HTML to your clipboard in both HTML and plain text formats
 
+  *- for easily pasting text, from e.g. AI generated content, into the Markdown Editor, and copying it right back into the clipboard as formatted text, for using in Word, Powerpoint, etc.*
+
 ## How to Use
 
 ### Writing Markdown
