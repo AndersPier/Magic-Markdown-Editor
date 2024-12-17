@@ -31,9 +31,13 @@ The editor provides quick formatting buttons for:
 
 ## How to Use
 
+### Saving the Magic Markdown Editor to your desktop
+1. Save the *magic-markdown-editor.html* file to your desktop
+2. Double click the saved *magic-markdown-editor.html* file, to open it locally on your desktop
+
 ### Writing Markdown
 1. Open the Magic Markdown Editor
-2. Start typing in the left text area
+2. Press the blue "Paste Markdown Text" button, or start typing in the left text area
 3. See your markdown instantly rendered in the right panel
 
 ### Formatting Text
@@ -41,8 +45,8 @@ The editor provides quick formatting buttons for:
 - Keyboard shortcuts work as standard markdown syntax
 
 ### Copying Content
-1. Click the "Copy Rendered Text" button
-2. The text is automatically copied to your clipboard
+1. Click the green "Copy Rendered Text" button
+2. The text is automatically copied to your clipboard, as formatted text (for inserting into e.g. Word, Powerpoint, etc.)
 3. A green checkmark confirms successful copying
 
 ## Supported Markdown Elements
