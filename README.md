@@ -60,11 +60,11 @@ The editor provides quick formatting buttons for:
 ### Code
 - Inline code: ``code``
 - Code blocks:
-  ```
-  ```python
-  def hello_world():
-      print("Hello, World!")
-  ```
+```markdown
+    ``python
+    print("Hello, World!")
+    ``
+```
 
 ### Lists
 - Unordered list:
