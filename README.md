@@ -1,4 +1,5 @@
 # Magic Markdown Editor ✨
+![Magic Markdown Editor](https://github.com/AndersPier/Magic-Markdown-Editor/blob/main/magic-markdown-editor.png)
 
 ## Overview
 
