@@ -65,7 +65,6 @@ The editor provides quick formatting buttons for:
   def hello_world():
       print("Hello, World!")
   ```
-  ```
 
 ### Lists
 - Unordered list:
@@ -110,7 +109,7 @@ Compatible with modern web browsers that support:
 Feel free to fork the project, submit pull requests, or report issues on the project's repository.
 
 ## License
-MIT
+MIT License
 
 ## Contact
 ✨ Magic Markdown Editor Team
