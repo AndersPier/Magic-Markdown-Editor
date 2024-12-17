@@ -32,11 +32,10 @@ The editor provides quick formatting buttons for:
 ## How to Use
 
 ### Saving the Magic Markdown Editor to your desktop
-1. Save the *magic-markdown-editor.html* file to your desktop
-2. Double click the saved *magic-markdown-editor.html* file, to open it locally on your desktop
+1. Save the "magic-markdown-editor.html" file to your desktop
 
 ### Writing Markdown
-1. Open the Magic Markdown Editor
+1. Open the Magic Markdown Editor (the "magic-markdown-editor.html" file, saved to your desktop)
 2. Press the blue "Paste Markdown Text" button, or start typing in the left text area
 3. See your markdown instantly rendered in the right panel
 
