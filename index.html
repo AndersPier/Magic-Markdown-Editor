@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Markdown Editor ✨</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .fancy-title {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #db2777, #4f46e5);
+            background-size: 200% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: shimmer 3s linear infinite;
+            text-shadow: 0 0 10px rgba(79, 70, 229, 0.2);
+            font-size: 3.0rem;
+            line-height: 1.2;
+            padding: 0.5rem 0;
+        }
+
+        .sparkle {
+            display: inline-block;
+            animation: bounce 2s ease infinite;
+            font-size: 2.8rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .prose h1 { font-size: 2.25em; font-weight: bold; margin-bottom: 0.8em; }
+        .prose h2 { font-size: 1.875em; font-weight: bold; margin-bottom: 0.7em; }
+        .prose h3 { font-size: 1.5em; font-weight: bold; margin-bottom: 0.6em; }
+        .prose p { margin-bottom: 1em; }
+        .prose ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+        .prose ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
+        .prose code { background-color: #f4f4f4; padding: 0.2em 0.4em; border-radius: 0.25em; }
+        .prose pre { background-color: #f4f4f4; padding: 1em; border-radius: 0.5em; margin-bottom: 1em; }
+        
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 240px;
+        }
+
+        .fixed-buttons {
+            position: fixed;
+            top: 240px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .content-wrapper {
+            margin-top: 300px;
+            margin-bottom: 60px;
+            overflow: auto;
+        }
+
+        .format-button {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .format-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .success-checkmark {
+            display: none;
+            color: #10B981;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Fixed Header -->
+        <header class="fixed-header bg-white shadow-md">
+            <div class="max-w-7xl mx-auto h-full flex items-center justify-between p-4">
+                <div class="flex items-center flex-1">
+                    <h1 class="text-4xl font-bold text-center flex-1">
+                        <span class="fancy-title">Magic Markdown Editor</span>
+                        <span class="sparkle">✨</span>
+                    </h1>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-6 text-blue-600">
+                        <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.5 22.5h-4v-4l8.42-8.39Z"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Fixed Buttons Bar -->
+        <div class="fixed-buttons">
+            <div class="max-w-7xl mx-auto p-4">
+                <div class="flex items-center justify-between">
+                    <!-- Left side: Paste button -->
+                    <div class="flex items-center space-x-4">
+                        <button id="pasteBtn" class="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition" title="Paste Markdown Text from Clipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600">
+                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                            </svg>
+                            <span class="text-blue-600 font-medium">Paste Markdown Text</span>
+                        </button>
+
+                        <!-- Format Ribbon -->
+                        <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm">
+                            <button class="format-button" title="Bold" onclick="insertMarkdown('**', '**')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+                                    <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+                                </svg>
+                            </button>
+                            <button class="format-button" title="Italic" onclick="insertMarkdown('*', '*')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="19" y1="4" x2="10" y2="4"></line>
+                                    <line x1="14" y1="20" x2="5" y2="20"></line>
+                                    <line x1="15" y1="4" x2="9" y2="20"></line>
+                                </svg>
+                            </button>
+                            <button class="format-button" title="H1" onclick="insertMarkdown('# ', '')"><b>H1</b></button>
+                            <button class="format-button" title="H2" onclick="insertMarkdown('## ', '')"><b>H2</b></button>
+                            <button class="format-button" title="H3" onclick="insertMarkdown('### ', '')"><b>H3</b></button>
+                            <button class="format-button" title="Table" onclick="insertTable()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                    <line x1="12" y1="3" x2="12" y2="21"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right side: Rendered text label and copy button -->
+                    <div class="flex items-center space-x-4">
+                        <button id="copyBtn" class="flex items-center space-x-2 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg transition" title="Copy Rendered Text to Clipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                            </svg>
+                            <span class="text-green-600 font-medium">Copy Rendered Text</span>
+                            <svg id="successCheckmark" class="success-checkmark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-wrapper flex p-4 space-x-4">
+            <!-- Markdown Input Column -->
+            <div class="flex flex-col w-1/2 bg-white rounded-lg shadow-md overflow-hidden">
+                <textarea id="markdownInput" class="flex-1 p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Type or paste your markdown text here..."></textarea>
+            </div>
+
+            <!-- Rendered HTML Column -->
+            <div class="flex flex-col w-1/2 bg-white rounded-lg shadow-md overflow-hidden">
+                <div id="renderedOutput" class="flex-1 p-4 overflow-auto bg-gray-50 prose prose-blue"></div>
+            </div>
+        </div>
+
+        <!-- Fixed Footer -->
+        <footer class="fixed-footer p-4 text-center text-gray-500">
+            Magic Markdown Editor ✨ | Simple, Elegant, Powerful
+        </footer>
+    </div>
+
+    <script>
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-'
+        });
+
+        const markdownInput = document.getElementById('markdownInput');
+        const renderedOutput = document.getElementById('renderedOutput');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const successCheckmark = document.getElementById('successCheckmark');
+
+        function insertMarkdown(prefix, suffix) {
+            const start = markdownInput.selectionStart;
+            const end = markdownInput.selectionEnd;
+            const text = markdownInput.value;
+            const selectedText = text.substring(start, end);
+            const replacement = prefix + selectedText + suffix;
+            
+            markdownInput.value = text.substring(0, start) + replacement + text.substring(end);
+            markdownInput.focus();
+            markdownInput.setSelectionRange(start + prefix.length, end + prefix.length);
+            updatePreview();
+        }
+
+        function insertTable() {
+            const tableTemplate = `
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+`;
+            const start = markdownInput.selectionStart;
+            markdownInput.value = markdownInput.value.substring(0, start) + tableTemplate + markdownInput.value.substring(start);
+            updatePreview();
+        }
+
+        function updatePreview() {
+            renderedOutput.innerHTML = marked.parse(markdownInput.value);
+        }
+
+        function showSuccessCheckmark() {
+            successCheckmark.style.display = 'inline-block';
+            setTimeout(() => {
+                successCheckmark.style.display = 'none';
+            }, 2000);
+        }
+
+        function htmlToPlainText(html) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const convertElement = (element) => {
+                if (element.nodeType === Node.TEXT_NODE) {
+                    return element.textContent;
+                }
+
+                switch (element.nodeName.toLowerCase()) {
+                    case 'h1':
+                        return `# ${element.textContent}\n\n`;
+                    case 'h2':
+                        return `## ${element.textContent}\n\n`;
+                    case 'h3':
+                        return `### ${element.textContent}\n\n`;
+                    case 'p':
+                        return `${element.textContent}\n\n`;
+                    case 'strong':
+                        return `**${element.textContent}**`;
+                    case 'em':
+                        return `*${element.textContent}*`;
+                    case 'code':
+                        return `\`${element.textContent}\``;
+                    case 'pre':
+                        return `\`\`\`\n${element.textContent}\n\`\`\`\n\n`;
+                    case 'ul':
+                        return Array.from(element.children)
+                            .map(li => `- ${li.textContent}`)
+                            .join('\n') + '\n\n';
+                    case 'ol':
+                        return Array.from(element.children)
+                            .map((li, index) => `${index + 1}. ${li.textContent}`)
+                            .join('\n') + '\n\n';
+                    default:
+                        return Array.from(element.childNodes)
+                            .map(convertElement)
+                            .join('');
+                }
+            };
+
+            return Array.from(tempDiv.childNodes)
+                .map(convertElement)
+                .join('')
+                .trim();
+        }
+
+        markdownInput.addEventListener('input', updatePreview);
+
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const clipboardText = await navigator.clipboard.readText();
+                markdownInput.value = clipboardText;
+                updatePreview();
+            } catch (err) {
+                console.error('Clipboard access failed:', err);
+            }
+        });
+        
+        copyBtn.addEventListener('click', async () => {
+            try {
+                const htmlBlob = new Blob([renderedOutput.innerHTML], { type: 'text/html' });
+                const plainText = htmlToPlainText(renderedOutput.innerHTML);
+                const textBlob = new Blob([plainText], { type: 'text/plain' });
+                
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': htmlBlob,
+                        'text/plain': textBlob
+                    })
+                ]);
+                
+                showSuccessCheckmark();
+            } catch (err) {
+                console.error('Clipboard write failed:', err);
+            }
+        });
+
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+</html>
